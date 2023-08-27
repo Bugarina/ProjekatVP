@@ -34,6 +34,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -43,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileManipulationOptions.cs" />
+    <Compile Include="IFileTransport.cs" />
     <Compile Include="Models\Audit.cs" />
     <Compile Include="Models\ImportedFile.cs" />
     <Compile Include="Models\Load.cs" />

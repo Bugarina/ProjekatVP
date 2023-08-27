@@ -3,6 +3,7 @@ using Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -26,7 +27,7 @@ namespace DataBase
                 db.Load(options.MS);
 
                 string date = DateTime.Now.ToString("yyyy-dd-MM");
-                XmlNodeList rows = db.SelectNodes($"//row[TIME_STAMP[contains(., '" + date + "')]]");
+                XmlNodeList rows = db.SelectNodes($"//row[TIME_STAMP]");
 
                 foreach (XmlNode row in rows)
                 {
@@ -142,8 +143,16 @@ namespace DataBase
 
                     if (element != null)
                     {
-                        element.SelectSingleNode("MEASURED_VALUE").InnerText = l.MeasuredValue.ToString();
-                        db.Save(path);
+                        if(l.ForecastValue == -1)
+                        {
+                            element.SelectSingleNode("MEASURED_VALUE").InnerText = l.MeasuredValue.ToString();
+                            db.Save(path);
+                        }
+                        else
+                        {
+                            element.SelectSingleNode("FORECAST_VALUE").InnerText = l.ForecastValue.ToString(CultureInfo.InvariantCulture);
+                            db.Save(path);
+                        }
                     }
                     else
                     {
@@ -157,12 +166,12 @@ namespace DataBase
                         measuredValueElement.InnerText = l.MeasuredValue.ToString();
                         
                         XmlElement forecastValueElement = db.CreateElement("FORECAST_VALUE");
-                        forecastValueElement.InnerText = l.ForecastValue.ToString();
+                        forecastValueElement.InnerText = l.ForecastValue.ToString(CultureInfo.InvariantCulture);
                         
-                        XmlElement absDevElement = db.CreateElement("FORECAST_VALUE");
+                        XmlElement absDevElement = db.CreateElement("ABSOLUTE_PERCENTAGE_DEVIATION");
                         absDevElement.InnerText = l.AbsolutePercentageDeviation.ToString();
                         
-                        XmlElement squaredDevElement = db.CreateElement("FORECAST_VALUE");
+                        XmlElement squaredDevElement = db.CreateElement("SQUARED_DEVIATION");
                         squaredDevElement.InnerText = l.SquaredDeviation.ToString();
 
                         XmlElement idElement = db.CreateElement("IMPORTED_FILE_ID");
@@ -185,6 +194,43 @@ namespace DataBase
             }
         }
 
+        public void WriteCalculation(List<Load> podaci, string path)
+        {
+            using (FileManipulationOptions options = OpenFile(path))
+            {
+                XmlDocument db = new XmlDocument();
+                db.Load(options.MS);
+
+                options.MS.Position = 0;
+
+                XmlNodeList rows = db.SelectNodes("//row");
+                int maxID = rows.Count;
+
+                foreach (Load l in podaci)
+                {
+                    XmlNode element = null;
+
+                    try
+                    {
+                        element = db.SelectSingleNode($"//row[TIME_STAMP = '{l.Timestamp.ToString("yyyy-MM-dd HH:mm")}']");
+                    }
+                    catch { }
+
+
+                    if (element != null)
+                    {
+                       
+                            element.SelectSingleNode("ABSOLUTE_PERCENTAGE_DEVIATION").InnerText = l.AbsolutePercentageDeviation.ToString();
+                            element.SelectSingleNode("SQUARED_DEVIATION").InnerText = l.SquaredDeviation.ToString();
+                            db.Save(path);
+                       
+                    }
+                    
+                }
+
+                options.Dispose();
+            }
+        }
 
         public FileManipulationOptions OpenFile(string path)
         {
