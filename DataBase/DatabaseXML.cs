@@ -42,11 +42,12 @@ namespace DataBase
             return loads;
         }
 
-        public void Write(List<Load> loads, List<Audit> audits, string loadsPath, string auditsPath)
+        public void Write(List<Load> loads, List<Audit> audits, List<ImportedFile> files, string loadsPath, string auditsPath, string filesPath)
         {
 
             WriteLoad(loads, loadsPath);
             WriteAudit(audits, auditsPath);
+            WriteImportedFile(files, filesPath);
 
         }
 
@@ -108,6 +109,58 @@ namespace DataBase
                     newRow.AppendChild(timeStampElement);
                     newRow.AppendChild(messageTypeElement);
                     newRow.AppendChild(messageElement);
+
+                    XmlElement rootElement = db.DocumentElement;
+                    rootElement.AppendChild(newRow);
+                    db.Save(path);
+                }
+
+                options.Dispose();
+            }
+        }
+
+        private void WriteImportedFile(List<ImportedFile> files, string path)
+        {
+            using (FileManipulationOptions options = OpenFile(path))
+            {
+                XmlDocument db = new XmlDocument();
+                db.Load(options.MS);
+
+                XmlNodeList rows = db.SelectNodes("//row");
+                int maxID = rows.Count;
+
+                foreach (ImportedFile a in files)
+                {
+                    a.Id = ++maxID;
+
+                    XmlElement newRow = db.CreateElement("row");
+
+                    XmlElement idElement = db.CreateElement("ID");
+                    idElement.InnerText = a.Id.ToString();
+
+                    XmlElement nameElement = db.CreateElement("FILE_NAME");
+                    nameElement.InnerText = a.FileName;
+
+                    newRow.AppendChild(idElement);
+                    newRow.AppendChild(nameElement);
+
+                    XmlElement rootElement = db.DocumentElement;
+                    rootElement.AppendChild(newRow);
+                    db.Save(path);
+                }
+
+                if (files.Count == 0)
+                {
+                    XmlElement newRow = db.CreateElement("row");
+
+                    XmlElement idElement = db.CreateElement("ID");
+                    idElement.InnerText = (++maxID).ToString();
+
+                    XmlElement nameElement = db.CreateElement("FILE_NAME");
+                    nameElement.InnerText = "FILENAME";
+
+                    newRow.AppendChild(idElement);
+                    newRow.AppendChild(nameElement);
 
                     XmlElement rootElement = db.DocumentElement;
                     rootElement.AppendChild(newRow);

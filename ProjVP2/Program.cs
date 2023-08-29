@@ -90,7 +90,7 @@ namespace ProjVP2
 
             memoryStream.Position = 0;
 
-            using (FileManipulationOptions options = new FileManipulationOptions(memoryStream, "data"))
+            using (FileManipulationOptions options = new FileManipulationOptions(memoryStream, Path.GetFileName(filePath)))
             {
                 success = csvProxy.ParseFile(options,isForecast, out errors);
                 options.Dispose();

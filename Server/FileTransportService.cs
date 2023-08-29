@@ -17,7 +17,11 @@ namespace Server
         public static DatabaseXML db = new DatabaseXML();
         public delegate List<Load> CalculationDelegateHandler(object sender, List<Load> args);
         Calculation calculation = new Calculation();
-           
+
+        private static Dictionary<int,Load> LoadsInMemory = new Dictionary<int,Load>();
+        private static Dictionary<int,Audit> AuditsInMemory = new Dictionary<int,Audit>();
+        private static Dictionary<int,ImportedFile> FilesInMemory = new Dictionary<int,ImportedFile>();
+        public static DatabaseIM imdb = new DatabaseIM();  
 
         public void Calculate()
         {
@@ -27,11 +31,21 @@ namespace Server
             db.WriteCalculation(args, ConfigurationManager.AppSettings["DBLoads"]);
         }
 
+        public void CalculateIM()
+        {
+            List<Load> args = LoadsInMemory.Values.ToList();
+            args = calculation.InvokeEvent(args);
+            LoadsInMemory = imdb.WriteCalculation(LoadsInMemory,args);
+        }
+
+
         [OperationBehavior(AutoDisposeParameters = true)]
         public bool ParseFile(FileManipulationOptions options,bool isForecast, out List<Audit> errors)
         {
             errors = new List<Audit>();
             List<Load> values = new List<Load>();
+            List<ImportedFile> impfiles = new List<ImportedFile>();
+            impfiles.Add(new ImportedFile(1,options.FileName));
             int line = 1;
 
             using (StreamReader stream = new StreamReader(options.MS))
@@ -116,9 +130,30 @@ namespace Server
 
                 return false;
             }
+            if(ConfigurationManager.AppSettings["DBType"] == "xml")
+            {
 
-            db.Write(values, errors, ConfigurationManager.AppSettings["DBLoads"], ConfigurationManager.AppSettings["DBAudits"]);
+            db.Write(values, errors,impfiles, ConfigurationManager.AppSettings["DBLoads"], ConfigurationManager.AppSettings["DBAudits"], ConfigurationManager.AppSettings["DBFiles"]);
             Calculate();
+            }
+            else
+            {
+                LoadsInMemory = imdb.WriteLoad(LoadsInMemory, values);
+                AuditsInMemory = imdb.WriteAudit(AuditsInMemory, errors, options.FileName);
+                FilesInMemory = imdb.WriteImportedFile(FilesInMemory, impfiles);
+                CalculateIM();
+
+                foreach (var x in LoadsInMemory)
+                {
+                    Console.WriteLine("-----------------");
+                    Console.WriteLine(x.Key);
+                    Console.WriteLine(x.Value.ForecastValue);
+                    Console.WriteLine(x.Value.MeasuredValue);
+                    Console.WriteLine(x.Value.Timestamp);
+                    Console.WriteLine(x.Value.SquaredDeviation);
+                    Console.WriteLine("-----------------");
+                }
+            }
 
             if (errors.Count > 0)
             {
