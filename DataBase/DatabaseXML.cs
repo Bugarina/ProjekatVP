@@ -26,7 +26,7 @@ namespace DataBase
                 XmlDocument db = new XmlDocument();
                 db.Load(options.MS);
 
-                string date = DateTime.Now.ToString("yyyy-dd-MM");
+                //string date = DateTime.Now.ToString("yyyy-dd-MM");
                 XmlNodeList rows = db.SelectNodes($"//row[TIME_STAMP]");
 
                 foreach (XmlNode row in rows)

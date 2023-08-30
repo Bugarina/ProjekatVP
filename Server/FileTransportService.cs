@@ -46,7 +46,7 @@ namespace Server
             List<Load> values = new List<Load>();
             List<ImportedFile> impfiles = new List<ImportedFile>();
             impfiles.Add(new ImportedFile(1,options.FileName));
-            int line = 1;
+            int line = 2;
 
             using (StreamReader stream = new StreamReader(options.MS))
             {
@@ -54,8 +54,9 @@ namespace Server
                 string[] csv_rows = data.Split('\n');
                 string[] rows = csv_rows.Take(csv_rows.Length - 1).ToArray();
 
-                foreach (var row in rows)
+                for (int i = 1; i < rows.Length; i++)
                 {
+                    string row = rows[i];
                     char[] delimiters = { ',' };
                     string[] rowSplit = row.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
 
