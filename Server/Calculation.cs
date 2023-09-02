@@ -24,6 +24,7 @@ namespace Server
         {
             foreach (Load item in args)
             {
+                if(item.MeasuredValue != -1 && item.ForecastValue != -1)
                 item.SquaredDeviation = Math.Pow(((item.MeasuredValue - item.ForecastValue) / item.ForecastValue),2);
             }
             return args;
@@ -33,7 +34,8 @@ namespace Server
         {
             foreach (Load item in args)
             {
-                item.AbsolutePercentageDeviation = ((item.MeasuredValue - item.ForecastValue) / item.ForecastValue) * 100;
+                if (item.MeasuredValue != -1 && item.ForecastValue != -1)
+                    item.AbsolutePercentageDeviation = ((item.MeasuredValue - item.ForecastValue) / item.ForecastValue) * 100;
             }
             return args;
         }

@@ -37,6 +37,16 @@ namespace Common
                 if (disposing)
                 {
                     // TODO: dispose managed state (managed objects)
+                    try
+                    {
+                        MS.Dispose();
+                        MS.Close();
+                        MS = null;
+                    }
+                    catch (System.Exception)
+                    {
+                        Console.WriteLine("Unsuccesful disposing!");
+                    }
                 }
 
                 // TODO: free unmanaged resources (unmanaged objects) and override finalizer
@@ -46,11 +56,11 @@ namespace Common
         }
 
         // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-        // ~FileManipulationOptions()
-        // {
-        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        //     Dispose(disposing: false);
-        // }
+         ~FileManipulationOptions()
+         {
+             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+             Dispose(disposing: false);
+         }
 
         public void Dispose()
         {

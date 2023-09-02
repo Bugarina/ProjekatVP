@@ -24,12 +24,13 @@ namespace Common.Models
         public double SquaredDeviation { get => squaredDeviation; set => squaredDeviation = value; }
         public int ImportedFileId { get => importedFileId; set => importedFileId = value; }
 
-        public Load(int id, DateTime timestamp, double measuredValue, double forecastValue)
+        public Load(int id, DateTime timestamp, double measuredValue, double forecastValue, int fid)
         {
             this.id = id;
             this.timestamp = timestamp;
             this.measuredValue = measuredValue;
             this.forecastValue = forecastValue;
+            this.importedFileId = fid;
         }
 
         public Load()

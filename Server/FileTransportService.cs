@@ -17,6 +17,7 @@ namespace Server
         public static DatabaseXML db = new DatabaseXML();
         public delegate List<Load> CalculationDelegateHandler(object sender, List<Load> args);
         Calculation calculation = new Calculation();
+        private static int fnbrojac = 100;
 
         private static Dictionary<int,Load> LoadsInMemory = new Dictionary<int,Load>();
         private static Dictionary<int,Audit> AuditsInMemory = new Dictionary<int,Audit>();
@@ -47,7 +48,7 @@ namespace Server
             List<ImportedFile> impfiles = new List<ImportedFile>();
             impfiles.Add(new ImportedFile(1,options.FileName));
             int line = 2;
-
+            ++fnbrojac;
             using (StreamReader stream = new StreamReader(options.MS))
             {
                 string data = stream.ReadToEnd();
@@ -105,13 +106,13 @@ namespace Server
                                     {
 
                                         values.Add(
-                                            new Load(1, vreme, vrednost, -1)
+                                            new Load(1, vreme, vrednost, -1, fnbrojac)
                                         );
                                     }
                                     else
                                     {
                                     values.Add(
-                                       new Load(1, vreme, -1, vrednost) 
+                                       new Load(1, vreme, -1, vrednost, fnbrojac) 
                                     );
                                     }
                                 }

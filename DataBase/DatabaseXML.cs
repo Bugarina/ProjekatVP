@@ -31,7 +31,7 @@ namespace DataBase
 
                 foreach (XmlNode row in rows)
                 {
-                    Load load = new Load(ID++, DateTime.Parse(row.SelectSingleNode("TIME_STAMP").InnerText), double.Parse(row.SelectSingleNode("MEASURED_VALUE").InnerText), double.Parse(row.SelectSingleNode("FORECAST_VALUE").InnerText));
+                    Load load = new Load(ID++, DateTime.Parse(row.SelectSingleNode("TIME_STAMP").InnerText), double.Parse(row.SelectSingleNode("MEASURED_VALUE").InnerText), double.Parse(row.SelectSingleNode("FORECAST_VALUE").InnerText), int.Parse(row.SelectSingleNode("IMPORTED_FILE_ID").InnerText));
 
                     loads.Add(load);
                 }
